@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MEOW GLITCH</title>
+  <link rel="stylesheet" href="css/meow-terminal.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app">
+    <div class="pane top">
+      <div class="window-bar">
+        <span class="brand">MEOW GLITCH</span>
+        <button class="btn" id="open">&gt;&gt;OPEN</button>
+        <button class="btn" id="add">&gt;&gt;ADD LAYER</button>
+        <span class="spacer"></span>
+        <span class="readout" id="docReadout">DOC:--</span>
+        <button class="btn" id="export" disabled>&gt;&gt;EXPORT</button>
+      </div>
+    </div>
+
+    <section class="pane panel-pane">
+      <header class="panel-head">
+        <nav class="panel-tabs"><button class="selected" tabindex="-1">LAYERS</button></nav>
+        <div class="panel-controls"><span class="readout" id="layerCount">LYR:0</span></div>
+      </header>
+      <div class="panel-body column">
+        <ul class="layers" id="layers" aria-label="Layers"></ul>
+        <div class="scroll">
+          <div class="empty" id="layerEmpty">
+            <div>&gt; SELECT A LAYER<span class="cursor">_</span></div>
+          </div>
+          <div id="layerProps" hidden>
+            <section class="section">
+              <h3>// LAYER</h3>
+              <div id="layerControls"></div>
+              <div class="row wrap">
+                <button class="btn" id="layerUp">&gt;&gt;UP</button>
+                <button class="btn" id="layerDown">&gt;&gt;DOWN</button>
+                <button class="btn" id="layerCenter">&gt;&gt;CENTER</button>
+                <button class="btn" id="layerCover">&gt;&gt;COVER</button>
+              </div>
+              <div class="row wrap">
+                <button class="btn" id="layerFit" title="Resize the canvas to this layer">&gt;&gt;CANVAS TO LAYER</button>
+                <button class="btn" id="layerDelete">&gt;&gt;DELETE</button>
+              </div>
+            </section>
+            <section class="section">
+              <h3>// TRIM</h3>
+              <div id="trimControls"></div>
+            </section>
+            <section class="section" id="keySection">
+              <h3>// COLOR KEY</h3>
+              <div id="keyControls"></div>
+              <p class="note">PIXELS NEAR THE KEY COLOUR BECOME TRANSPARENT. BIAS WIDENS THE RANGE OF COLOURS REMOVED; SOFTNESS FEATHERS THE EDGE.</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane panel-pane" id="canvasPane">
+      <header class="panel-head">
+        <nav class="panel-tabs"><button class="selected" tabindex="-1">CANVAS</button></nav>
+        <div class="panel-controls">
+          <span class="readout" id="viewReadout">VIEW:--</span>
+          <button class="btn" id="compare" title="Hold to see the image without FX (or hold \)">&gt;&gt;HOLD TO COMPARE</button>
+        </div>
+      </header>
+      <div class="panel-body">
+        <div class="stage" id="stage">
+          <canvas id="view" hidden></canvas>
+          <div class="empty" id="stageEmpty">
+            <div>&gt; AWAITING IMAGE<span class="cursor">_</span></div>
+            <button class="btn" id="openEmpty">&gt;&gt;OPEN AN IMAGE</button>
+          </div>
+        </div>
+      </div>
+      <div class="status" id="status">&gt; DROP, PASTE OR OPEN AN IMAGE</div>
+    </section>
+
+    <section class="pane panel-pane">
+      <header class="panel-head">
+        <nav class="panel-tabs" id="fxTabs">
+          <button data-tab="layer" title="FX on the selected layer, before it is blended">LAYER FX</button><button data-tab="master" title="FX on the finished composite">MASTER FX</button>
+        </nav>
+        <div class="panel-controls">
+          <button class="btn" id="foldAll" title="Expand or collapse every module">&gt;&gt;FOLD</button>
+          <button class="btn" id="randomize">&gt;&gt;RANDOMIZE</button>
+          <button class="btn" id="resetFx">&gt;&gt;RESET</button>
+        </div>
+      </header>
+      <div class="panel-body column">
+        <div class="scroll">
+          <div class="empty" id="fxEmpty" hidden>
+            <div>&gt; SELECT A LAYER<span class="cursor">_</span></div>
+          </div>
+          <div id="fxControls"></div>
+          <section class="section">
+            <h3>// EXPORT</h3>
+            <div id="exportControls"></div>
+            <div class="kv"><span>OUTPUT</span><span id="outReadout">--</span></div>
+            <p class="note" id="exportNote">LAYER FX RUN BEFORE THE LAYER IS BLENDED. MASTER FX RUN ON THE COMPOSITE. FX RUN TOP TO BOTTOM. DOUBLE-CLICK A SLIDER TO RESET IT.</p>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <input type="file" id="fileOpen" accept="image/*" hidden>
+  <input type="file" id="fileAdd" accept="image/*" multiple hidden>
+  <script src="app.js"></script>
+</body>
+</html>
