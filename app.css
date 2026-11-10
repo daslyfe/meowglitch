@@ -59,7 +59,7 @@ body {
   list-style: none;
   overflow-y: auto;
   border-bottom: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 14px;
   scrollbar-width: thin;
   scrollbar-color: var(--muted) var(--bg);
 }
@@ -96,7 +96,7 @@ body {
 }
 
 .layers button {
-  font-size: 12px;
+  font-size: 14px;
   white-space: nowrap;
   text-align: left;
 }
@@ -169,7 +169,7 @@ body {
   min-height: var(--row-height);
   padding: var(--space-2) var(--space-10);
   border-top: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -260,13 +260,24 @@ input[type='range']:hover::-moz-range-thumb {
   }
 }
 
+.app.browser-on {
+  grid-template-columns: 240px 250px minmax(0, 1fr) 320px;
+}
+
+@media (max-width: 1100px) {
+  .app.browser-on {
+    grid-template-columns: 200px 220px minmax(0, 1fr) 290px;
+  }
+}
+
 @media (max-width: 800px) {
   html,
   body {
     overflow: auto;
   }
 
-  .app {
+  .app,
+  .app.browser-on {
     height: auto;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 60vh auto auto;
@@ -340,7 +351,7 @@ input[type='range']:hover::-moz-range-thumb {
 /* FX groups and folding sections */
 .fx-group {
   padding: var(--space-12) 0 var(--space-2);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   border-bottom: 1px solid var(--border);
 }
@@ -361,4 +372,197 @@ input[type='range']:hover::-moz-range-thumb {
 .fold-mark {
   color: var(--muted);
   font-weight: 400;
+}
+
+/* File browser */
+#browserPane .panel-body {
+  min-height: 0;
+}
+
+.tree {
+  flex: 1;
+  min-height: 0;
+  border-right: 0;
+}
+
+.tree li {
+  display: flex;
+}
+
+.tree li > button.node {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding-right: var(--space-4);
+}
+
+.tree .twisty {
+  flex: none;
+  width: 1ch;
+  color: var(--muted);
+}
+
+.tree li > button.star {
+  flex: none;
+  width: auto;
+  padding: 0 var(--space-6);
+  color: var(--muted);
+}
+
+.tree li > button.star.on,
+.tree li > button.star:hover {
+  color: var(--accent);
+}
+
+.tree li.missing .files-name {
+  color: var(--muted);
+}
+
+.tree li.selected,
+.tree li.selected button,
+.tree li.selected span,
+.tree li.selected button.star.on {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.preview {
+  flex: none;
+  border-top: 1px solid var(--border);
+}
+
+.preview-img {
+  height: 150px;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-img img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.preview-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.browser-search {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+}
+
+/* Text layer fonts (licences in fonts/licenses) */
+@font-face {
+  font-family: 'MG BigBlue Terminal';
+  src: url('fonts/text/BigBlueTerminal.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Fira Code';
+  src: url('fonts/text/FiraCode.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG VT323';
+  src: url('fonts/text/VT323.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Share Tech Mono';
+  src: url('fonts/text/ShareTechMono.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Space Mono';
+  src: url('fonts/text/SpaceMono.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Press Start 2P';
+  src: url('fonts/text/PressStart2P.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Silkscreen';
+  src: url('fonts/text/Silkscreen.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Pixelify Sans';
+  src: url('fonts/text/PixelifySans.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Major Mono Display';
+  src: url('fonts/text/MajorMonoDisplay.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Cherry Bomb One';
+  src: url('fonts/text/CherryBombOne.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG DynaPuff';
+  src: url('fonts/text/DynaPuff.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Hachi Maru Pop';
+  src: url('fonts/text/HachiMaruPop.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Mochiy Pop One';
+  src: url('fonts/text/MochiyPopOne.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Sniglet';
+  src: url('fonts/text/Sniglet.woff2') format('woff2');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'MG Pacifico';
+  src: url('fonts/text/Pacifico.woff2') format('woff2');
+  font-display: block;
+}
+
+.text-input {
+  display: block;
+  width: 100%;
+  margin: var(--space-6) 0;
+  padding: var(--space-4) var(--space-6);
+  border: 1px solid var(--border);
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.text-input:focus {
+  border-color: var(--accent);
+  outline: none;
 }

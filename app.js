@@ -250,6 +250,7 @@ const state = {
   compare: false,
   format: 0, // 0 PNG, 1 JPG
   quality: 92,
+  outScale: 100, // export size, % of the canvas
   previewScale: 1,
 };
 let nextId = 1;
@@ -1262,7 +1263,8 @@ function drawLayer(ctx, l, s) {
   ctx.save();
   ctx.translate((l.x + (l.w * l.scale) / 2) * s, (l.y + (l.h * l.scale) / 2) * s);
   if (l.rot) ctx.rotate((l.rot * Math.PI) / 180);
-  ctx.drawImage(l.bmp, sx, sy, sw, sh, (sx - l.w / 2) * k, (sy - l.h / 2) * k, sw * k, sh * k);
+  const r = l.res || 1; // bitmap pixels per layer unit (text renders at 2x)
+  ctx.drawImage(l.bmp, sx * r, sy * r, sw * r, sh * r, (sx - l.w / 2) * k, (sy - l.h / 2) * k, sw * k, sh * k);
   ctx.restore();
 }
 
@@ -1369,11 +1371,15 @@ function makePicker(label, options, get, set, after) {
   next.setAttribute('aria-label', 'Next ' + label.toLowerCase());
   const s = el('select');
   s.setAttribute('aria-label', label);
-  options.forEach((o, i) => {
-    const opt = el('option', null, o);
-    opt.value = String(i);
-    s.append(opt);
-  });
+  const fill = () => {
+    s.textContent = '';
+    options.forEach((o, i) => {
+      const opt = el('option', null, o);
+      opt.value = String(i);
+      s.append(opt);
+    });
+  };
+  fill();
   p.append(prev, s, next);
   f.append(p);
   const update = () => { s.value = String(get() ?? 0); };
@@ -1387,7 +1393,8 @@ function makePicker(label, options, get, set, after) {
   prev.addEventListener('click', () => apply((get() ?? 0) - 1));
   next.addEventListener('click', () => apply((get() ?? 0) + 1));
   update();
-  return { el: f, update, inputs: [prev, s, next] };
+  const setOptions = (list) => { options = list; fill(); update(); };
+  return { el: f, update, setOptions, inputs: [prev, s, next] };
 }
 
 let statusTimer = 0;
@@ -1938,14 +1945,18 @@ async function loadFiles(files, replace) {
   refreshAll();
 }
 
-function addLayer(bmp, name) {
-  const l = {
+function makeLayer(bmp, name) {
+  return {
     id: nextId++, name, bmp, w: bmp.width, h: bmp.height,
     x: 0, y: 0, scale: 1, rot: 0, opacity: 100, blend: 'source-over', visible: true,
     trimL: 0, trimR: 0, trimT: 0, trimB: 0,
     key: { on: false, color: '#00ff00', bias: 15, soft: 10 },
     fx: defaultFx(),
   };
+}
+
+function addLayer(bmp, name) {
+  const l = makeLayer(bmp, name);
   if (!state.doc) {
     state.doc = { w: bmp.width, h: bmp.height, name };
   } else {
@@ -2012,16 +2023,21 @@ function canvasToLayer() {
    Export
 ------------------------------------------------------------------ */
 
-function exportScale() {
+// The requested export scale, capped by the GPU's texture size and the
+// browser's canvas area limit.
+function exportLimit() {
   const { w, h } = state.doc;
-  return Math.min(1, maxDim / Math.max(w, h), Math.sqrt(CANVAS_MAX_AREA / (w * h)));
+  return Math.min(maxDim / Math.max(w, h), Math.sqrt(CANVAS_MAX_AREA / (w * h)));
 }
+const exportScale = () => Math.min(state.outScale / 100, exportLimit());
 
 function updateOut() {
   if (!state.doc) { $('outReadout').textContent = '--'; return; }
   const s = exportScale();
   const w = Math.round(state.doc.w * s), h = Math.round(state.doc.h * s);
-  $('outReadout').textContent = `${w}x${h} ${state.format ? 'JPG' : 'PNG'}`;
+  const capped = state.outScale / 100 > exportLimit();
+  $('outReadout').textContent = `${w}x${h} ${state.format ? 'JPG' : 'PNG'}${capped ? ' (MAX SIZE)' : ''}`;
+  $('outReadout').title = capped ? 'Capped at the largest image this GPU and browser can render' : '';
 }
 
 function buildExport() {
@@ -2030,7 +2046,8 @@ function buildExport() {
   const q = makeSlider({ label: 'JPG QUALITY', min: 10, max: 100, def: 92 }, () => state.quality, (v) => (state.quality = v));
   const syncQ = () => q.inputs.forEach((i) => (i.disabled = state.format === 0));
   syncQ();
-  root.append(fmt.el, q.el);
+  const sc = makeSlider({ label: 'SCALE %', min: 10, max: 400, def: 100 }, () => state.outScale, (v) => { state.outScale = v; updateOut(); });
+  root.append(fmt.el, q.el, sc.el);
 }
 
 async function exportImage() {
@@ -2094,7 +2111,8 @@ function pickKeyColour(e, rect) {
   const [bx, by] = docToLayer(l, px, py);
   if (bx < 0 || by < 0 || bx >= l.w || by >= l.h) { setStatus('! THAT POINT IS OUTSIDE THE SELECTED LAYER', true); return; }
   pickCtx.clearRect(0, 0, 1, 1);
-  pickCtx.drawImage(l.bmp, Math.floor(bx), Math.floor(by), 1, 1, 0, 0, 1, 1);
+  const res = l.res || 1;
+  pickCtx.drawImage(l.bmp, Math.floor(bx * res), Math.floor(by * res), 1, 1, 0, 0, 1, 1);
   const [r, g, b] = pickCtx.getImageData(0, 0, 1, 1).data;
   l.key.color = '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
   l.key.on = true;
@@ -2175,6 +2193,7 @@ window.addEventListener('drop', (e) => {
   e.preventDefault();
   dragDepth = 0;
   pane.classList.remove('drop');
+  if (e.dataTransfer?.types?.includes(BROWSER_MIME)) { dropFromBrowser(e); return; } // see browser.js
   if (e.dataTransfer?.files?.length) loadFiles(e.dataTransfer.files, false);
 });
 window.addEventListener('paste', (e) => {

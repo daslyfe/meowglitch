@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MEOW GLITCH</title>
+  <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="css/meow-terminal.css">
   <link rel="stylesheet" href="app.css">
 </head>
@@ -12,13 +13,45 @@
     <div class="pane top">
       <div class="window-bar">
         <span class="brand">MEOW GLITCH</span>
+        <button class="btn" id="browserToggle" title="Show or hide the file browser">&gt;&gt;BROWSER</button>
         <button class="btn" id="open">&gt;&gt;OPEN</button>
         <button class="btn" id="add">&gt;&gt;ADD LAYER</button>
+        <button class="btn" id="addText">&gt;&gt;ADD TEXT</button>
         <span class="spacer"></span>
         <span class="readout" id="docReadout">DOC:--</span>
         <button class="btn" id="export" disabled>&gt;&gt;EXPORT</button>
       </div>
     </div>
+
+    <section class="pane panel-pane" id="browserPane" hidden>
+      <header class="panel-head">
+        <nav class="panel-tabs" id="browserTabs">
+          <button data-tab="all">ALL</button><button data-tab="starred">STARRED</button><button data-tab="recent">RECENT</button>
+        </nav>
+        <div class="panel-controls">
+          <span class="readout" id="browserCount">DIR:0</span>
+          <button class="btn" id="addFolder">&gt;&gt;ADD FOLDER</button>
+        </div>
+      </header>
+      <div class="panel-body column files">
+        <ul class="files-list tree" id="tree" aria-label="Image folders"></ul>
+        <div class="preview">
+          <div class="preview-img">
+            <img id="previewImg" alt="" hidden>
+            <div class="files-hint" id="previewEmpty">&gt; SELECT AN IMAGE<span class="cursor">_</span></div>
+          </div>
+          <div class="files-bar"><span class="files-path"><bdi dir="ltr" id="previewName">--</bdi></span></div>
+          <div class="files-bar">
+            <span class="readout preview-info" id="previewInfo">--</span>
+            <button class="btn" id="previewAdd" disabled title="Add as a new layer (or double-click, Enter, or drag to the canvas)">&gt;&gt;ADD</button>
+            <button class="btn" id="previewOpen" disabled title="Open as a new image (Shift+Enter)">&gt;&gt;OPEN</button>
+          </div>
+        </div>
+        <div class="files-bar browser-search">
+          <input class="bar-input" id="browserSearch" placeholder="SEARCH" aria-label="Search images by name" spellcheck="false">
+        </div>
+      </div>
+    </section>
 
     <section class="pane panel-pane">
       <header class="panel-head">
@@ -45,6 +78,10 @@
                 <button class="btn" id="layerFit" title="Resize the canvas to this layer">&gt;&gt;CANVAS TO LAYER</button>
                 <button class="btn" id="layerDelete">&gt;&gt;DELETE</button>
               </div>
+            </section>
+            <section class="section" id="textSection" hidden>
+              <h3>// TEXT</h3>
+              <div id="textControls"></div>
             </section>
             <section class="section">
               <h3>// TRIM</h3>
@@ -110,6 +147,10 @@
 
   <input type="file" id="fileOpen" accept="image/*" hidden>
   <input type="file" id="fileAdd" accept="image/*" multiple hidden>
+  <input type="file" id="folderPick" webkitdirectory multiple hidden>
+  <input type="file" id="fontPick" accept=".ttf,.otf,.woff,.woff2,font/*" hidden>
   <script src="app.js"></script>
+  <script src="browser.js"></script>
+  <script src="text.js"></script>
 </body>
 </html>
